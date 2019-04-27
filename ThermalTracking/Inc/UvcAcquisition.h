@@ -34,7 +34,7 @@ public:
 	static void frameCallback(uvc_frame_t *frame, void *userptr);
 	void startStream();
 	void pauseStream();
-	std::queue<cv::Mat>* returnQueue();
+	std::queue<cv::Mat> returnQueue();
 	virtual ~UvcAcquisition();
 
 	struct cb_context {

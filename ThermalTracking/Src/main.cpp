@@ -57,8 +57,8 @@ int main(int argc, char **argv) {
 		resizeWindow("Lepton Radiometry", 640,480);
 
 		try{
-			if(!uvcacquisition->returnQueue()->empty()) {
-				data = uvcacquisition->returnQueue()->back();
+			if(!uvcacquisition->returnQueue().empty()) {
+				data = uvcacquisition->returnQueue().back();
 			}
 			else{
 				//break;

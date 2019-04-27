@@ -7,7 +7,7 @@
 
 #include "../Inc/UvcAcquisition.h"
 
-std::queue<cv::Mat> *frameQueue;
+std::queue<cv::Mat> frameQueue;
 
 UvcAcquisition::UvcAcquisition()
 {
@@ -18,7 +18,7 @@ UvcAcquisition::~UvcAcquisition() {
 	// TODO Auto-generated destructor stub
 }
 
-std::queue<cv::Mat>* UvcAcquisition::returnQueue(){
+std::queue<cv::Mat> UvcAcquisition::returnQueue(){
 	return frameQueue;
 }
 
@@ -104,7 +104,7 @@ void UvcAcquisition::frameCallback(uvc_frame_t *frame, void *userptr) {
 
 	//Check if queue is full
 	/*if(q.size() > )*/
-	frameQueue->push(Img_Source16Bit_Gray);
+	frameQueue.push(Img_Source16Bit_Gray);
 }
 
 void UvcAcquisition::setVideoFormat(){
