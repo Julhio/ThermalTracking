@@ -127,26 +127,6 @@
                         					
                     </folderInfo>
                     					
-                    <folderInfo id="cdt.managedbuild.config.gnu.exe.release.606468490.1070294484" name="/" resourcePath="Test">
-                        						
-                        <toolChain id="cdt.managedbuild.toolchain.gnu.exe.release.107016683" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.release" unusedChildren="">
-                            							
-                            <tool id="cdt.managedbuild.tool.gnu.archiver.base.8194692" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.992064614"/>
-                            							
-                            <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1730774451" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.360696545"/>
-                            							
-                            <tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1516658882" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release.677178590"/>
-                            							
-                            <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.1182665944" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release.147832792"/>
-                            							
-                            <tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.1006412737" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.1053035560"/>
-                            							
-                            <tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.1036199480" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release.238291195"/>
-                            						
-                        </toolChain>
-                        					
-                    </folderInfo>
-                    					
                     <sourceEntries>
                         						
                         <entry excluding="Test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
