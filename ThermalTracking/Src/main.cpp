@@ -15,19 +15,53 @@ Mat infrared_cam;
 float ktoc(float val){
 	return ((val - 27315) / 100.0);
 }
-
+//uint8_t channels = 0;
 Mat raw_to_8bit(Mat frame){
 	Mat colorMat16;
+
+	//channels = frame.channels();
 
 	normalize(frame, frame, 0, 65535, NORM_MINMAX, CV_16UC1);
 
 	Mat image_grayscale = frame.clone();
 	image_grayscale.convertTo(image_grayscale, CV_8UC1, 1 / 256.0);
-
-	cvtColor(image_grayscale, colorMat16, COLOR_GRAY2RGB);
-
+	if(frame.size){
+		cvtColor(image_grayscale, colorMat16, COLOR_GRAY2RGB);
+	}
 	return colorMat16;
 }
+
+/*Mat norm_0_255(Mat src) {
+
+	// Create and return normalized image:
+	Mat dst;
+
+	switch(src.channels()) {
+
+	case 1:
+
+		normalize(_src, dst, 0, 255, NORM_MINMAX, CV_8UC1);
+
+		break;
+
+	case 3:
+
+		cv::normalize(_src, dst, 0, 255, NORM_MINMAX, CV_8UC3);
+
+		break;
+
+	default:
+
+		src.copyTo(dst);
+
+		break;
+
+	}
+
+	return dst;
+
+}*/
+
 
 void display_temperature(Mat img, double val_k, Point loc, Scalar color){
 	float val = ktoc(val_k);
@@ -49,29 +83,30 @@ String window_name = "Face Tracking";
  */
 Mat detectFaces(Mat frame) {
 
-  std::vector<Rect> faces;
-  Mat frame_gray;
+	std::vector<Rect> faces;
+	Mat frame_gray;
 
-  // Convert to gray scale
-  cvtColor(frame, frame_gray, COLOR_BGR2GRAY);
+	// Convert to gray scale
+	if(frame.size){
+		cvtColor(frame, frame_gray, COLOR_BGR2GRAY);
+	}
+	// Equalize histogram
+	equalizeHist(frame_gray, frame_gray);
 
-  // Equalize histogram
-  equalizeHist(frame_gray, frame_gray);
+	// Detect faces
+	face_cascade.detectMultiScale(frame_gray, faces, 1.1, 3,
+			0|CASCADE_SCALE_IMAGE, Size(30, 30));
 
-  // Detect faces
-  face_cascade.detectMultiScale(frame_gray, faces, 1.1, 3,
-				0|CASCADE_SCALE_IMAGE, Size(30, 30));
+	// Iterate over all of the faces
+	for( size_t i = 0; i < faces.size(); i++ ) {
 
-  // Iterate over all of the faces
-  for( size_t i = 0; i < faces.size(); i++ ) {
+		// Find center of faces
+		Point center(faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2);
 
-    // Find center of faces
-    Point center(faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2);
+		rectangle(frame, faces[i], cv::Scalar(0,255,0), LINE_4);
+	}
 
-    rectangle(frame, faces[i], cv::Scalar(0,255,0), LINE_4);
-  }
-
-  return frame;
+	return frame;
 }
 
 int main(int argc, char **argv) {
@@ -84,7 +119,14 @@ int main(int argc, char **argv) {
 	// Start the video stream. The library will call user function callback:
 	uvcacquisition->startStream();
 
-	VideoCapture visible_cam(0); // Open default camera
+	VideoCapture visible_cam;
+
+	if(!visible_cam.open(0)){ // Open default camera
+		visible_cam.open(1);
+	}
+	//Enable and disable the autofocus
+	visible_cam.set(CAP_PROP_AUTOFOCUS, 1);
+	visible_cam.set(CAP_PROP_AUTOFOCUS, 0);
 	//Mat frame;
 	visible_cam.set(3,640);
 	visible_cam.set(4,480);
@@ -93,16 +135,13 @@ int main(int argc, char **argv) {
 	face_cascade.load("Data/haarcascade_frontalface_alt.xml");
 
 	cv::Mat3b visible_frame;
-
+	Mat visible_frame_out;
 	while(true){
 
-		visible_cam >>  visible_frame;
+		visible_cam >> visible_frame;
 
-		// Display frame
-		imshow( window_name, detectFaces(visible_frame) /* Call function to detect faces*/ );
-
-		namedWindow("Lepton Radiometry", cv::WINDOW_NORMAL);
-		resizeWindow("Lepton Radiometry", 640,480);
+		namedWindow(window_name, cv::WINDOW_NORMAL);
+		resizeWindow(window_name, 1280,480);
 
 		try{
 			if(!uvcacquisition->returnQueue().empty()) {
@@ -120,7 +159,16 @@ int main(int argc, char **argv) {
 
 			// Display frame
 			if (!infrared_cam.empty()) {
-				imshow("Lepton Radiometry", infrared_cam);
+
+				// Create 1280x480 mat for window
+				cv::Mat win_mat(cv::Size(1280, 480), CV_8UC3);
+
+				// Copy small images into big mat
+				detectFaces(visible_frame).copyTo(win_mat(cv::Rect(  0, 0, 640, 480)));
+				infrared_cam.copyTo(win_mat(cv::Rect(640, 0, 640, 480)));
+
+				// Display big mat
+				imshow(window_name, win_mat);
 			}
 		}
 		catch (exception& e){
@@ -135,7 +183,7 @@ int main(int argc, char **argv) {
 
 	destroyAllWindows();
 
-	//uvcacquisition->pauseStream();
+	uvcacquisition->pauseStream();
 
 	return 0;
 }
