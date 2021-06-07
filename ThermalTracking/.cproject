@@ -103,6 +103,12 @@
                                     									
                                     <listOptionValue builtIn="false" value="opencv_videoio"/>
                                     									
+                                    <listOptionValue builtIn="false" value="opencv_dnn"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="opencv_tracking"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="opencv_face"/>
+                                    									
                                     <listOptionValue builtIn="false" value="uvc"/>
                                     								
                                 </option>

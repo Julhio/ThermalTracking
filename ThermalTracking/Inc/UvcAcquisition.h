@@ -28,7 +28,7 @@ typedef std::vector<uvc_frame_desc*> fmtVector;
 class UvcAcquisition {
 public:
 	UvcAcquisition();
-	void init();
+	uvc_error_t init();
 	fmtVector *uvc_get_frame_formats_by_guid(uvc_device_handle_t *devh, unsigned char *vs_fmt_guid);
 	void setVideoFormat();
 	static void frameCallback(uvc_frame_t *frame, void *userptr);
@@ -36,6 +36,7 @@ public:
 	void pauseStream();
 	std::queue<cv::Mat> returnQueue();
 	virtual ~UvcAcquisition();
+	bool isConnected();
 
 	struct cb_context {
 		FILE *out;
@@ -52,6 +53,7 @@ protected:
 	uvc_stream_ctrl_t ctrl;
 	uvc_error_t res;
 	Mat img;
+	bool uvc_connected;
 private:
 };
 

@@ -22,13 +22,11 @@ std::queue<cv::Mat> UvcAcquisition::returnQueue(){
 	return frameQueue;
 }
 
-void UvcAcquisition::init() {
-	uvc_error_t res;
-
+uvc_error_t UvcAcquisition::init() {
 	res = uvc_init(&ctx, NULL);	// Initialize a UVC service context.
 	if (res < 0) {
 		uvc_perror(res, "uvc_init");
-		return; //res;
+		return res; //res;
 	}
 	puts("UVC initialized");
 
@@ -37,7 +35,7 @@ void UvcAcquisition::init() {
 
 	if (res < 0) {
 		uvc_perror(res, "uvc_find_device"); /* no devices found */
-		return;
+		return res;
 	}
 
 	puts("Device found");
@@ -50,7 +48,7 @@ void UvcAcquisition::init() {
 		/* Release the device descriptor */
 		uvc_unref_device(dev);
 		dev = NULL;
-		return;
+		return res;
 	}
 
 	if (res < 0) {
@@ -65,6 +63,7 @@ void UvcAcquisition::init() {
 	} //else {
 
 	setVideoFormat();
+	return res;
 }
 
 fmtVector *UvcAcquisition::uvc_get_frame_formats_by_guid(uvc_device_handle_t *devh, unsigned char *vs_fmt_guid){
@@ -108,14 +107,18 @@ void UvcAcquisition::frameCallback(uvc_frame_t *frame, void *userptr) {
 }
 
 void UvcAcquisition::setVideoFormat(){
-	res = uvc_get_stream_ctrl_format_size(devh, &ctrl, UVC_FRAME_FORMAT_Y16, 80, 60, 9);
+	if (res == 0) {
+		res = uvc_get_stream_ctrl_format_size(devh, &ctrl, UVC_FRAME_FORMAT_Y16, 80, 60, 9);
 
+		if (res < 0) {
+			uvc_perror(res, "get_mode"); /* device doesn't provide a matching stream */
+		}
+	}
+	else {
+		puts("No UVC device connected");
+	}
 	/* Print out the result */
 	//uvc_print_stream_ctrl(&ctrl, stderr);
-
-	if (res < 0) {
-		uvc_perror(res, "get_mode"); /* device doesn't provide a matching stream */
-	}
 }
 
 void UvcAcquisition::pauseStream() {
@@ -129,20 +132,36 @@ void UvcAcquisition::pauseStream() {
 
 	uvc_exit(ctx);
 	puts("UVC exited");
+	uvc_connected = false;
 }
 
 void UvcAcquisition::startStream() {
-    uvc_start_streaming(devh, &ctrl, UvcAcquisition::frameCallback, &cb_ctx, 0);
+	if (res == 0) {
+		uvc_start_streaming(devh, &ctrl, UvcAcquisition::frameCallback, &cb_ctx, 0);
 
-    if (res < 0) {
-        uvc_perror(res, "start_streaming"); /* unable to start stream */
-        uvc_close(devh);
-        puts("Device closed");
+		if (res < 0) {
+			uvc_perror(res, "start_streaming"); /* unable to start stream */
+			uvc_close(devh);
+			puts("Device closed");
 
-        return;
-    }
-    puts("Streaming...");
+			return;
+		}
+
+		puts("Streaming...");
+		uvc_connected = true;
+	}
+	else{
+		puts("No UVC device connected");
+		uvc_connected = false;
+	}
+
 }
+
+bool UvcAcquisition::isConnected(){
+	return uvc_connected;
+}
+
+
 
 
 

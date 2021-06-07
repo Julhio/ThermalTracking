@@ -15,13 +15,21 @@
 #include <queue>
 #include <thread>
 #include <vector>
-#include <thread>
-#include <libuvc/libuvc.h>
+#include <tuple>
+
 #include "opencv2/core/core.hpp"
 #include "opencv2/objdetect.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
+#include <opencv2/dnn.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/face.hpp>
+
+#include <libuvc/libuvc.h>
+
 #include "../Inc/UvcAcquisition.h"
+#include "../MTCNN/Inc/detector.h"
 
 #endif /* INC_MAIN_H_ */
