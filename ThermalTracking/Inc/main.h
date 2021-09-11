@@ -16,6 +16,7 @@
 #include <thread>
 #include <vector>
 #include <tuple>
+#include <math.h>
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/objdetect.hpp"
